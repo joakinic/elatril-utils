@@ -2,7 +2,7 @@
 
 # Instalar dependencias
 apt update
-apt install xserver-xephyr -y
+apt install xserver-xephyr wmctrl -y
 
 # Dar permisos de ejecución al script
 chmod +x linux-session.sh
