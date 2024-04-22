@@ -16,7 +16,7 @@ if [ -f "~/linux-session.config" ]; then
 fi
 
 # Comprobar si se proporciona un parámetro para maximizar la ventana
-if [ "$1" == "--no-maximize" ]; then
+if [ $1 == "--no-maximize" ]; then
     MAXIMIZE=false
 fi
 
@@ -25,7 +25,7 @@ Xephyr -query "$IP" -reset -resizeable -title "$TITLE" :1 &
 sleep 1
 
 # Maximizar la ventana si MAXIMIZE es verdadero
-if [ "$MAXIMIZE" == true ]; then
+if [ $MAXIMIZE ]; then
     wmctrl -r "$TITLE" -b add,maximized_vert,maximized_horz
     sleep 9
     wmctrl -r "$TITLE" -b add,maximized_vert,maximized_horz
