@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Sesion Linux Fierro
+Exec=/usr/share/applications/linux-session.sh
+Icon=/usr/share/icons/linux-session/linux-session.png
+Terminal=false
