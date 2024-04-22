@@ -2,5 +2,5 @@
 Type=Application
 Name=Sesion Linux Fierro
 Exec=/usr/share/applications/linux-session.sh
-Icon=/usr/share/icons/linux-session/linux-session.png
+Icon=/usr/share/icons/X.Org_Logo.svg
 Terminal=false
