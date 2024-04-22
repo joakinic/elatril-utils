@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
 Name=Sesion Linux Fierro
-Exec=/usr/share/applications/linux-session.sh
+Exec=linux-session
 Icon=/usr/share/icons/X.Org_Logo.svg
 Terminal=false
