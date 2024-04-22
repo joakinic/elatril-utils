@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Valores por defecto
 IP="192.168.0.252"
