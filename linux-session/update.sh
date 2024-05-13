@@ -11,6 +11,7 @@ cp linux-session.sh /usr/local/bin/linux-session -v
 cp linux-session.desktop /usr/share/applications/ -v
 echo
 echo - Sincronizando archivo de configuración global
+mkdir -p /etc/elatril-utils
 cp linux-session.config /etc/elatril-utils/linux-session.config -v
 echo
 echo - Finalizado
