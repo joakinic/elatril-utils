@@ -6,13 +6,13 @@ TITLE="Sesion Linux | Fierro"
 MAXIMIZE=true  # Valor por defecto para maximizar la ventana
 
 # Comprobar si existe el archivo de configuración global
-if [ -f "/etc/linux-session/linux-session.config" ]; then
-    . /etc/linux-session/linux-session.config
+if [ -f "linux-session.config" ]; then
+    . linux-session.config
 fi
 
-# Comprobar si existe el archivo de configuración de usuario
-if [ -f "~/linux-session.config" ]; then
-    . "~/linux-session.config"
+# Comprobar si existe un archivo de configuración de usuario
+if [ -f "~/elatril-utils/linux-session.config" ]; then
+    . "~/elatril-utils/linux-session.config"
 fi
 
 # Comprobar si se proporciona un parámetro para maximizar la ventana
