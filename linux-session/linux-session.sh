@@ -20,6 +20,11 @@ if [ $1 == "--no-maximize" ]; then
     MAXIMIZE=false
 fi
 
+# Comprobar si se debe matar la sesión antes de iniciarla
+IF [ $KILL_SESSION_BEFORE_START ]; then
+    ssh USER@$IP pkill -kill -u $USER
+fi
+
 # Ejecutar Xephyr con los valores configurados
 Xephyr -query "$IP" -reset -resizeable -title "$TITLE" :1 &
 sleep 1
