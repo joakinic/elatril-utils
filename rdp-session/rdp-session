@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# ABRIR SESIÓN RDP
+
+# Valores por defecto
+IP="192.168.0.252"
+USER=""
+PASSWORD=""
+FULLSCREEN=true
+
+# Comprobar si existe el archivo de configuración global
+if [ -f "/etc/elatril-utils/rdp-session.config" ]; then
+    . /etc/elatril-utils/rdp-session.config
+fi
+
+# Comprobar si existe un archivo de configuración de usuario
+if [ -f "~/elatril-utils/rdp-session.config" ]; then
+    . "~/elatril-utils/rdp-session.config"
+fi
+
+# Construir argumentos de xfreerdp dinámicamente
+ARGS="/v:$IP /workarea"
+
+if [ "$FULLSCREEN" = true ]; then
+    ARGS="$ARGS /f"
+fi
+
+if [ -n "$USER" ]; then
+    ARGS="$ARGS /u:$USER"
+fi
+
+if [ -n "$PASSWORD" ]; then
+    ARGS="$ARGS /p:$PASSWORD"
+fi
+
+# Ejecutar xfreerdp con los argumentos construidos
+xfreerdp $ARGS
