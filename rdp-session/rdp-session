@@ -19,10 +19,12 @@ if [ -f "~/elatril-utils/rdp-session.config" ]; then
 fi
 
 # Construir argumentos de xfreerdp dinámicamente
-ARGS="/v:$IP /workarea"
+ARGS="/v:$IP /kbd:0x0000080A"
 
 if [ "$FULLSCREEN" = true ]; then
     ARGS="$ARGS /f"
+else 
+    ARGS="$ARGS /workarea"
 fi
 
 if [ -n "$USER" ]; then
