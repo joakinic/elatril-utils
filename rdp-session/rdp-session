@@ -35,5 +35,6 @@ if [ -n "$PASSWORD" ]; then
     ARGS="$ARGS /p:$PASSWORD"
 fi
 
+setxkbmap es
 # Ejecutar xfreerdp con los argumentos construidos
 xfreerdp $ARGS
