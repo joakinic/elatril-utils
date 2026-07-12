@@ -30,8 +30,23 @@ if [ -f "$HOME/elatril-utils/rdp-session/rdp-session.config" ]; then
     . "$HOME/elatril-utils/rdp-session/rdp-session.config"
 fi
 
+# Detectar el binario de FreeRDP disponible (v3 tiene prioridad).
+# FreeRDP 3 (freerdp3-x11) usa el binario 'xfreerdp3' y exige el prefijo
+# 'layout:' en /kbd; FreeRDP 2 (freerdp2-x11) usa 'xfreerdp' y el /kbd simple.
+if command -v xfreerdp3 >/dev/null 2>&1; then
+    FREERDP_BIN="xfreerdp3"
+    KBD_ARG="/kbd:layout:$KBD_LAYOUT"
+elif command -v xfreerdp >/dev/null 2>&1; then
+    FREERDP_BIN="xfreerdp"
+    KBD_ARG="/kbd:$KBD_LAYOUT"
+else
+    echo "Error: no se encontró 'xfreerdp' ni 'xfreerdp3'." >&2
+    echo "Instalá el paquete freerdp2-x11 o freerdp3-x11." >&2
+    exit 1
+fi
+
 # Construir argumentos de xfreerdp dinámicamente
-ARGS="/v:$IP /kbd:$KBD_LAYOUT"
+ARGS="/v:$IP $KBD_ARG"
 
 if [ "$FULLSCREEN" = true ]; then
     ARGS="$ARGS /f"
@@ -50,5 +65,5 @@ fi
 # Fijar el teclado del host para que coincida con la sesión RDP
 setxkbmap "$XKB_LAYOUT"
 
-# Ejecutar xfreerdp con los argumentos construidos
-xfreerdp $ARGS
+# Ejecutar con el binario detectado y los argumentos construidos
+"$FREERDP_BIN" $ARGS
