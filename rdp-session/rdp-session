@@ -8,18 +8,30 @@ USER=""
 PASSWORD=""
 FULLSCREEN=true
 
+# Distribución de teclado. Se usan dos valores que deben ser coherentes entre sí:
+#   KBD_LAYOUT  -> código de layout para xfreerdp (/kbd)
+#   XKB_LAYOUT  -> layout del teclado del host (setxkbmap)
+#
+# Combinaciones más comunes en Argentina:
+#   Español (España):        KBD_LAYOUT="0x0000040A"  XKB_LAYOUT="es"
+#   Español (Latinoamérica): KBD_LAYOUT="0x0000080A"  XKB_LAYOUT="latam"
+#   Español (Argentina):     KBD_LAYOUT="0x00002C0A"  XKB_LAYOUT="latam"
+#   Inglés (EE.UU.):         KBD_LAYOUT="0x00000409"  XKB_LAYOUT="us"
+KBD_LAYOUT="0x0000040A"
+XKB_LAYOUT="es"
+
 # Comprobar si existe el archivo de configuración global
 if [ -f "/etc/elatril-utils/rdp-session.config" ]; then
     . /etc/elatril-utils/rdp-session.config
 fi
 
 # Comprobar si existe un archivo de configuración de usuario
-if [ -f "~/elatril-utils/rdp-session.config" ]; then
-    . "~/elatril-utils/rdp-session.config"
+if [ -f "$HOME/elatril-utils/rdp-session/rdp-session.config" ]; then
+    . "$HOME/elatril-utils/rdp-session/rdp-session.config"
 fi
 
 # Construir argumentos de xfreerdp dinámicamente
-ARGS="/v:$IP /kbd:0x0000080A"
+ARGS="/v:$IP /kbd:$KBD_LAYOUT"
 
 if [ "$FULLSCREEN" = true ]; then
     ARGS="$ARGS /f"
@@ -35,6 +47,8 @@ if [ -n "$PASSWORD" ]; then
     ARGS="$ARGS /p:$PASSWORD"
 fi
 
-setxkbmap es
+# Fijar el teclado del host para que coincida con la sesión RDP
+setxkbmap "$XKB_LAYOUT"
+
 # Ejecutar xfreerdp con los argumentos construidos
 xfreerdp $ARGS

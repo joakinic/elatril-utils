@@ -4,3 +4,12 @@ IP="192.168.0.252"
 USER=""
 PASSWORD=""
 FULLSCREEN=true
+
+# Distribución de teclado (KBD_LAYOUT para xfreerdp, XKB_LAYOUT para el host).
+# Combinaciones más comunes en Argentina:
+#   Español (España):        KBD_LAYOUT="0x0000040A"  XKB_LAYOUT="es"
+#   Español (Latinoamérica): KBD_LAYOUT="0x0000080A"  XKB_LAYOUT="latam"
+#   Español (Argentina):     KBD_LAYOUT="0x00002C0A"  XKB_LAYOUT="latam"
+#   Inglés (EE.UU.):         KBD_LAYOUT="0x00000409"  XKB_LAYOUT="us"
+KBD_LAYOUT="0x0000040A"
+XKB_LAYOUT="es"
