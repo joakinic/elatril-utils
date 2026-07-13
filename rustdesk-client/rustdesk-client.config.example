@@ -1,0 +1,24 @@
+#!/bin/bash
+# CONFIG PARA CLIENTE RUSTDESK
+# Copiá este archivo a rustdesk-client.config y completá los valores.
+
+# ID/rendezvous server (dominio o IP del servidor self-hosted). OBLIGATORIO.
+HOST="rustdesk.midominio.com"
+
+# Clave pública del servidor (Settings -> ID/Relay Server -> Key). OBLIGATORIO.
+KEY="q2t5M9AoCkUaTViSMyfXLtYNljWOjUKhR1FGIK3I0zI="
+
+# Relay server. Si queda vacío se usa HOST.
+RELAY=""
+
+# API server. Si queda vacío se usa https://HOST.
+API=""
+
+# Contraseña permanente (opcional). Vacío = no modificar.
+PASSWORD=""
+
+# Usuarios a configurar además del servicio (root). Ej: ("caja" "terminal1" "terminal2")
+USERS=()
+
+# Reiniciar el servicio de RustDesk al terminar.
+RESTART_SERVICE=true

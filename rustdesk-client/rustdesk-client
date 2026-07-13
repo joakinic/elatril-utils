@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# CONFIGURAR CLIENTE RUSTDESK POR LÍNEA DE COMANDOS (Ubuntu/Debian)
+#
+# Fija el servidor (ID/rendezvous, relay, API), la clave pública y, opcionalmente,
+# una contraseña permanente, SIN necesidad de abrir la interfaz gráfica.
+#
+# Método: escribe directamente el archivo RustDesk2.toml (lo más determinista) en
+# el config del servicio (root) y en el de los usuarios indicados, y aplica la
+# contraseña con 'rustdesk --password'. Debe ejecutarse como root (sudo).
+
+# Valores por defecto
+HOST=""                 # ID/rendezvous server (dominio o IP del servidor self-hosted)
+KEY=""                  # Clave pública del servidor
+RELAY=""                # Relay server (si queda vacío se usa HOST)
+API=""                  # API server (si queda vacío se usa https://HOST)
+PASSWORD=""             # Contraseña permanente (opcional; vacío = no tocar)
+USERS=()                # Usuarios a configurar además del servicio, ej: ("caja" "terminal1")
+RESTART_SERVICE=true    # Reiniciar el servicio de RustDesk al terminar
+
+# Cargar la config que está junto al script (se usa sólo al correrlo)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/rustdesk-client.config" ]; then
+    . "$SCRIPT_DIR/rustdesk-client.config"
+fi
+
+# Requiere root (escribe en /root/.config y reinicia el servicio)
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: ejecutá este script como root (sudo)." >&2
+    exit 1
+fi
+
+# Validar parámetros mínimos
+if [ -z "$HOST" ] || [ -z "$KEY" ]; then
+    echo "Error: falta HOST y/o KEY." >&2
+    echo "Configuralos en rustdesk-client.config (ver rustdesk-client.config.example)." >&2
+    exit 1
+fi
+
+# Detectar el binario de RustDesk
+if command -v rustdesk >/dev/null 2>&1; then
+    RUSTDESK_BIN="rustdesk"
+elif [ -x "/usr/bin/rustdesk" ]; then
+    RUSTDESK_BIN="/usr/bin/rustdesk"
+else
+    echo "Error: no se encontró el binario 'rustdesk'. Instalá el cliente primero." >&2
+    exit 1
+fi
+
+# Completar relay/API con HOST si no se especificaron
+[ -z "$RELAY" ] && RELAY="$HOST"
+[ -z "$API" ] && API="https://$HOST"
+
+# Escribir RustDesk2.toml en el directorio de config indicado, con owner/permisos
+# adecuados. Argumentos: 1) ruta al .config, 2) usuario dueño (para chown).
+write_config() {
+    CONFIG_DIR="$1/rustdesk"
+    OWNER="$2"
+    TOML="$CONFIG_DIR/RustDesk2.toml"
+
+    mkdir -p "$CONFIG_DIR"
+    cat > "$TOML" <<EOF
+rendezvous_server = '$HOST'
+nat_type = 1
+serial = 0
+
+[options]
+custom-rendezvous-server = '$HOST'
+key = '$KEY'
+relay-server = '$RELAY'
+api-server = '$API'
+EOF
+
+    if [ -n "$OWNER" ]; then
+        chown -R "$OWNER:$OWNER" "$CONFIG_DIR"
+    fi
+    echo "Config escrita en $TOML"
+}
+
+# Config del servicio (corre como root)
+write_config "/root/.config" "root"
+
+# Config por usuario
+for U in "${USERS[@]}"; do
+    HOME_DIR=$(getent passwd "$U" | cut -d: -f6)
+    if [ -z "$HOME_DIR" ] || [ ! -d "$HOME_DIR" ]; then
+        echo "Aviso: usuario '$U' sin home válido, se omite." >&2
+        continue
+    fi
+    write_config "$HOME_DIR/.config" "$U"
+done
+
+# Fijar contraseña permanente (opcional)
+if [ -n "$PASSWORD" ]; then
+    "$RUSTDESK_BIN" --password "$PASSWORD"
+    echo "Contraseña permanente configurada."
+fi
+
+# Reiniciar el servicio para que tome la nueva configuración
+if [ "$RESTART_SERVICE" = true ]; then
+    if systemctl list-unit-files | grep -q '^rustdesk\.service'; then
+        systemctl restart rustdesk
+        echo "Servicio rustdesk reiniciado."
+    else
+        echo "Aviso: no se encontró el servicio 'rustdesk'; reiniciá el cliente a mano." >&2
+    fi
+fi
+
+echo "Listo. ID de esta máquina:"
+"$RUSTDESK_BIN" --get-id
