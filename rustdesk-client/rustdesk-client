@@ -85,6 +85,26 @@ EOF
     echo "Config escrita en $TOML"
 }
 
+# Detectar si el servicio existe
+SERVICE_EXISTS=false
+if systemctl list-unit-files | grep -q '^rustdesk\.service'; then
+    SERVICE_EXISTS=true
+fi
+
+# IMPORTANTE: hay que frenar el servicio ANTES de escribir el TOML. Si está
+# corriendo, RustDesk mantiene su config en memoria y la vuelca al archivo al
+# detenerse, pisando lo que escribamos (por eso los cambios "no se aplican").
+if [ "$RESTART_SERVICE" = true ] && [ "$SERVICE_EXISTS" = true ]; then
+    systemctl stop rustdesk
+    echo "Servicio rustdesk detenido para escribir la config."
+elif [ "$RESTART_SERVICE" = true ]; then
+    echo "Aviso: no se encontró el servicio 'rustdesk'. Cerrá el cliente a mano" >&2
+    echo "       antes de continuar o la config podría ser pisada." >&2
+elif [ "$SERVICE_EXISTS" = true ]; then
+    echo "Aviso: RESTART_SERVICE=false y el servicio está corriendo; puede pisar" >&2
+    echo "       la config. Poné RESTART_SERVICE=true para escribirla de forma segura." >&2
+fi
+
 # Config del servicio (corre como root)
 write_config "/root/.config" "root"
 
@@ -98,20 +118,17 @@ for U in "${USERS[@]}"; do
     write_config "$HOME_DIR/.config" "$U"
 done
 
-# Fijar contraseña permanente (opcional)
+# Volver a arrancar el servicio para que tome la nueva configuración
+if [ "$SERVICE_EXISTS" = true ] && [ "$RESTART_SERVICE" = true ]; then
+    systemctl start rustdesk
+    echo "Servicio rustdesk iniciado."
+fi
+
+# Fijar contraseña permanente (opcional). Se hace con el servicio ya arriba
+# porque en Linux se aplica vía IPC contra la instancia en ejecución.
 if [ -n "$PASSWORD" ]; then
     "$RUSTDESK_BIN" --password "$PASSWORD"
     echo "Contraseña permanente configurada."
-fi
-
-# Reiniciar el servicio para que tome la nueva configuración
-if [ "$RESTART_SERVICE" = true ]; then
-    if systemctl list-unit-files | grep -q '^rustdesk\.service'; then
-        systemctl restart rustdesk
-        echo "Servicio rustdesk reiniciado."
-    else
-        echo "Aviso: no se encontró el servicio 'rustdesk'; reiniciá el cliente a mano." >&2
-    fi
 fi
 
 echo "Listo. ID de esta máquina:"
