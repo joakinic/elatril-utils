@@ -17,6 +17,10 @@ API=""
 # Contraseña permanente (opcional). Vacío = no modificar.
 PASSWORD=""
 
+# Permitir modificación remota de la configuración (Ajustes -> Seguridad).
+# Por defecto RustDesk lo trae desactivado. true = activarlo.
+ALLOW_REMOTE_CONFIG=false
+
 # Usuarios a configurar además del servicio (root). Ej: ("caja" "terminal1" "terminal2")
 USERS=()
 

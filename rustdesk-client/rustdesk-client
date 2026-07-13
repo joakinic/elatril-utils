@@ -15,6 +15,7 @@ KEY=""                  # Clave pública del servidor
 RELAY=""                # Relay server (si queda vacío se usa HOST)
 API=""                  # API server (si queda vacío se usa https://HOST)
 PASSWORD=""             # Contraseña permanente (opcional; vacío = no tocar)
+ALLOW_REMOTE_CONFIG=false # Permitir modificación remota de la configuración (Seguridad)
 USERS=()                # Usuarios a configurar además del servicio, ej: ("caja" "terminal1")
 RESTART_SERVICE=true    # Reiniciar el servicio de RustDesk al terminar
 
@@ -58,6 +59,12 @@ write_config() {
     OWNER="$2"
     TOML="$CONFIG_DIR/RustDesk2.toml"
 
+    # Línea opcional para permitir modificación remota de la configuración
+    REMOTE_CONFIG_LINE=""
+    if [ "$ALLOW_REMOTE_CONFIG" = true ]; then
+        REMOTE_CONFIG_LINE="allow-remote-config-modification = 'Y'"
+    fi
+
     mkdir -p "$CONFIG_DIR"
     cat > "$TOML" <<EOF
 rendezvous_server = '$HOST'
@@ -69,6 +76,7 @@ custom-rendezvous-server = '$HOST'
 key = '$KEY'
 relay-server = '$RELAY'
 api-server = '$API'
+$REMOTE_CONFIG_LINE
 EOF
 
     if [ -n "$OWNER" ]; then
