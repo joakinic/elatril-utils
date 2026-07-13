@@ -1,0 +1,17 @@
+#!/bin/bash
+# CONFIG PARA LA DISTRIBUCIÓN DE TECLADO
+# Copiá este archivo a keyboard-layout.config y ajustá los valores.
+
+# Distribución de teclado:
+#   "es"    -> Español (España)        [default]
+#   "latam" -> Español (Latinoamérica)
+LAYOUT="es"
+
+# Variante del layout (normalmente vacío).
+VARIANT=""
+
+# Modelo de teclado.
+MODEL="pc105"
+
+# Aplicar también a la sesión X actual (setxkbmap), sin esperar reinicio.
+APPLY_NOW=true

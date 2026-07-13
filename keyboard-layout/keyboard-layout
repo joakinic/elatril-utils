@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# FIJAR LA DISTRIBUCIÓN DE TECLADO A NIVEL SISTEMA (Ubuntu/Debian)
+#
+# Escribe /etc/default/keyboard de forma persistente y lo aplica sin reiniciar,
+# para que consola, X11, RDP y RustDesk usen el mismo layout. Reemplaza los
+# parches por app (ej: el setxkbmap de rdp-session). Correr como root (sudo).
+
+# Valores por defecto
+LAYOUT="es"          # Distribución: "es" (España) o "latam" (Latinoamérica)
+VARIANT=""           # Variante del layout (normalmente vacío)
+MODEL="pc105"        # Modelo de teclado
+APPLY_NOW=true       # Aplicar también a la sesión X actual (setxkbmap)
+
+# Cargar la config que está junto al script (se usa sólo al correrlo)
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/keyboard-layout.config" ]; then
+    . "$SCRIPT_DIR/keyboard-layout.config"
+fi
+
+# Requiere root (escribe en /etc/default/keyboard)
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: ejecutá este script como root (sudo)." >&2
+    exit 1
+fi
+
+# Escribir la config persistente
+cat > /etc/default/keyboard <<EOF
+XKBMODEL="$MODEL"
+XKBLAYOUT="$LAYOUT"
+XKBVARIANT="$VARIANT"
+XKBOPTIONS=""
+
+BACKSPACE="guess"
+EOF
+echo "Escrito /etc/default/keyboard (layout=$LAYOUT variant='$VARIANT')."
+
+# Regenerar la configuración de teclado (X11 y consola)
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
+if command -v setupcon >/dev/null 2>&1; then
+    setupcon
+fi
+
+# Aplicar a la sesión X actual para no tener que reiniciar
+if [ "$APPLY_NOW" = true ] && command -v setxkbmap >/dev/null 2>&1; then
+    if [ -n "$VARIANT" ]; then
+        setxkbmap "$LAYOUT" "$VARIANT" 2>/dev/null
+    else
+        setxkbmap "$LAYOUT" 2>/dev/null
+    fi
+    echo "Layout aplicado a la sesión X actual."
+fi
+
+echo "Listo. El cambio es persistente; en consola pura puede requerir reinicio."
