@@ -7,6 +7,12 @@ IP="192.168.0.252"
 USER=""
 PASSWORD=""
 FULLSCREEN=true
+# Si FULLSCREEN=false, se usa WINDOW_ARGS; si está vacío, se conserva el
+# comportamiento actual: /workarea. Para probar la resolución dinámica se puede
+# configurar por ejemplo: WINDOW_ARGS="/workarea /dynamic-resolution"
+# o dejarlo vacío y agregar argumentos extra con CUSTOM_ARGS.
+WINDOW_ARGS=""
+CUSTOM_ARGS=""
 
 # Distribución de teclado. Se usan dos valores que deben ser coherentes entre sí:
 #   KBD_LAYOUT  -> código de layout para xfreerdp (/kbd)
@@ -50,8 +56,16 @@ ARGS="/v:$IP $KBD_ARG"
 
 if [ "$FULLSCREEN" = true ]; then
     ARGS="$ARGS /f"
-else 
-    ARGS="$ARGS /workarea"
+else
+    if [ -n "$WINDOW_ARGS" ]; then
+        ARGS="$ARGS $WINDOW_ARGS"
+    else
+        ARGS="$ARGS /workarea"
+    fi
+fi
+
+if [ -n "$CUSTOM_ARGS" ]; then
+    ARGS="$ARGS $CUSTOM_ARGS"
 fi
 
 if [ -n "$USER" ]; then

@@ -4,6 +4,15 @@ IP="192.168.0.252"
 USER=""
 PASSWORD=""
 FULLSCREEN=true
+# Si FULLSCREEN=false, se puede definir WINDOW_ARGS para elegir la ventana:
+#   WINDOW_ARGS="/workarea"
+#   WINDOW_ARGS="/workarea /dynamic-resolution"
+#   WINDOW_ARGS="/workarea /smart-sizing"
+# Si querés conservar la parte actual y agregar un argumento extra, usá:
+#   CUSTOM_ARGS="/dynamic-resolution"
+# o dejar ambos vacíos para usar /workarea por defecto.
+WINDOW_ARGS=""
+CUSTOM_ARGS=""
 
 # Distribución de teclado (KBD_LAYOUT para xfreerdp, XKB_LAYOUT para el host).
 # Combinaciones más comunes en Argentina:
